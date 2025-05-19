@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ASPWebAPI.Controllers
 {
+    /// <summary>
+    /// Contoller for managing volunteers
+    /// Supports CRUD operations
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class VolunteerController : Controller
@@ -12,33 +16,30 @@ namespace ASPWebAPI.Controllers
             new Volunteer {Id = 1, Name = "Grisha", Role = "nurse", StartDate = new DateTime(2012, 12, 25, 10, 30, 50) }
         };
 
-
         /// <summary>
-        /// GET ALL VOLUNTEERS
+        /// Get all volunteers
         /// </summary>
-        /// <returns> VOLUNTEERS </returns>
+        /// <returns>volunteers</returns>
         [HttpGet]
         public ActionResult<IEnumerable<Volunteer>> GetAll()
         {
             return Ok(Volunteers);
         }
 
-
         /// <summary>
-        /// GET SINGLE VOLUNTEER BY ID
+        /// Get single volunteer by id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns> VOLUNTEER </returns>
+        /// <param name="id">volunteer id</param>
+        /// <returns>volunteer</returns>
         [HttpGet("{id}")]
         public ActionResult<Volunteer> GetById(int id) =>
             Volunteers.FirstOrDefault(v => v.Id == id) is { } volunteer ? Ok(volunteer) : NotFound();
 
-
         /// <summary>
-        /// CREATE A NEW VOLUNTEER
+        /// Create a new volunteer
         /// </summary>
-        /// <param name="volunteer"></param>
-        /// <returns>VOLUNTEER ID</returns>
+        /// <param name="volunteer">Volunteer object with name, role and startDate</param>
+        /// <returns>new volunteer</returns>
         [HttpPost]
         public ActionResult<Volunteer> Create(Volunteer volunteer)
         {
@@ -47,13 +48,12 @@ namespace ASPWebAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { Id = volunteer.Id }, volunteer);
         }
 
-
         /// <summary>
-        /// UPDATE VOLUNTEER BY ID
+        /// Update volunteer by id
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="updatedVolunteer"></param>
-        /// <returns></returns>
+        /// <param name="id">volunteer id</param>
+        /// <param name="updatedVolunteer">Volunteer object with updated values</param>
+        /// <returns>updated vounteer</returns>
         [HttpPut("{id}")]
         public IActionResult Update(int id, Volunteer updatedVolunteer)
         {
@@ -62,22 +62,21 @@ namespace ASPWebAPI.Controllers
             volunteer.Name = updatedVolunteer.Name;
             volunteer.StartDate = updatedVolunteer.StartDate;
             volunteer.Role = updatedVolunteer.Role;
-            return NoContent();
+            return Ok(volunteer);
         }
 
-
         /// <summary>
-        /// DELETE VOLUNTEER BY ID
+        /// Delete volunteer by id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">volunteer id</param>
+        /// <returns>deleted volunteer</returns>
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             var volunteer = Volunteers.FirstOrDefault(v => v.Id == id);
             if (volunteer is null) return NotFound();
             Volunteers.Remove(volunteer);
-            return NoContent();
+            return Ok(volunteer);
         }
 
     }

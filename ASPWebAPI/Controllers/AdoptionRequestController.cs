@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ASPWebAPI.Controllers
 {
+    /// <summary>
+    /// Contoller for managing adoption requests
+    /// Supports CRUD operations
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AdoptionRequestController : Controller
@@ -12,33 +16,30 @@ namespace ASPWebAPI.Controllers
            new AdoptionRequest {Id = 1, AdopterId = 1, PetId = 1, RequestDate = new DateTime(2012, 12, 25, 10, 30, 50), Status = "accepted"}
         };
 
-
         /// <summary>
-        /// GET ALL ADOPTION REQUESTS
+        /// Get all adoption requests
         /// </summary>
-        /// <returns> ADOPTIONS REQUESTS </returns>
+        /// <returns>adoption requests</returns>
         [HttpGet]
         public ActionResult<IEnumerable<AdoptionRequest>> GetAll()
         {
             return Ok(AdoptionRequests);
         }
 
-
         /// <summary>
-        /// GET SINGLE ADOPTION REQUEST BY ID
+        /// Get single adoption request by id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns> ADOPTION REQUEST </returns>
+        /// <param name="id">adoption request id</param>
+        /// <returns>adoption request</returns>
         [HttpGet("{id}")]
         public ActionResult<AdoptionRequest> GetById(int id) =>
             AdoptionRequests.FirstOrDefault(ad => ad.Id == id) is { } adoptionRequest ? Ok(adoptionRequest) : NotFound();
 
-
         /// <summary>
-        /// CREATE A NEW ADOPTION REQUEST
+        /// Create a new adoption request
         /// </summary>
-        /// <param name="adoptionRequest"></param>
-        /// <returns>ADOPTION REQUEST ID</returns>
+        /// <param name="adoptionRequest">Adoption request object with petId, adopterId, requestDate and status</param>
+        /// <returns>new adoption request</returns>
         [HttpPost]
         public ActionResult<AdoptionRequest> Create(AdoptionRequest adoptionRequest)
         {
@@ -47,13 +48,12 @@ namespace ASPWebAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { Id = adoptionRequest.Id }, adoptionRequest);
         }
 
-
         /// <summary>
-        /// UPDATE ADOPTION REQUEST BY ID
+        /// Update adoption request by id
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="updatedAdoptionRequest"></param>
-        /// <returns></returns>
+        /// <param name="id">adoption request id</param>
+        /// <param name="updatedAdoptionRequest">Adoption request object with updated values</param>
+        /// <returns> updated adoption request </returns>
         [HttpPut("{id}")]
         public IActionResult Update(int id, AdoptionRequest updatedAdoptionRequest)
         {
@@ -63,21 +63,21 @@ namespace ASPWebAPI.Controllers
             adoptionRequest.Status = updatedAdoptionRequest.Status;
             adoptionRequest.RequestDate = updatedAdoptionRequest.RequestDate;
             adoptionRequest.AdopterId = updatedAdoptionRequest.AdopterId;
-            return NoContent();
+            return Ok(adoptionRequest);
         }
 
         /// <summary>
-        /// DELETE ADOPTION REQUEST BY ID
+        /// Delete adoption request by id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">adoption request id</param>
+        /// <returns> deleted adoption request </returns>
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             var adoptionRequest = AdoptionRequests.FirstOrDefault(ad => ad.Id == id);
             if (adoptionRequest is null) return NotFound();
             AdoptionRequests.Remove(adoptionRequest);
-            return NoContent();
+            return Ok(adoptionRequest);
         }
     }
 }

@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ASPWebAPI.Controllers
 {
+    /// <summary>
+    /// Contoller for managing adopters
+    /// Supports CRUD operations
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AdopterController : Controller
@@ -13,9 +17,9 @@ namespace ASPWebAPI.Controllers
         };
 
         /// <summary>
-        /// GET ALL ADOPTERS
+        /// Get all adopters
         /// </summary>
-        /// <returns> ADOPTERS </returns>
+        /// <returns>adopters</returns>
         [HttpGet]
         public ActionResult<IEnumerable<Adopter>> GetAll()
         {
@@ -23,20 +27,19 @@ namespace ASPWebAPI.Controllers
         }
 
         /// <summary>
-        /// GET SINGLE ADOPTER BY ID
+        /// Get single adopter by id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns> ADOPTER </returns>
+        /// <param name="id">adopter id</param>
+        /// <returns>adopter</returns>
         [HttpGet("{id}")]
         public ActionResult<Adopter> GetById(int id) =>
             Adopters.FirstOrDefault(a => a.Id == id) is { } adopter ? Ok(adopter) : NotFound();
 
-
         /// <summary>
-        /// CREATE A NEW ADOPTER
+        /// Create a new adopter
         /// </summary>
-        /// <param name="adopter"></param>
-        /// <returns>ADOPTER ID</returns>
+        /// <param name="adopter">Adopter object with name, email and adoptionDate</param>
+        /// <returns>new adopter</returns>
         [HttpPost]
         public ActionResult<Adopter> Create(Adopter adopter)
         {
@@ -46,11 +49,11 @@ namespace ASPWebAPI.Controllers
         }
 
         /// <summary>
-        /// UPDATE ADOPTER BY ID
+        /// Update adopter by id
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="updatedAdopter"></param>
-        /// <returns></returns>
+        /// <param name="id">adopter id</param>
+        /// <param name="updatedAdopter">Adopter object with updated values</param>
+        /// <returns> updated adopter </returns>
         [HttpPut("{id}")]
         public IActionResult Update(int id, Adopter updatedAdopter)
         {
@@ -59,22 +62,21 @@ namespace ASPWebAPI.Controllers
             adopter.Name = updatedAdopter.Name;
             adopter.Email = updatedAdopter.Email;
             adopter.AdoptionDate = updatedAdopter.AdoptionDate;
-            return NoContent();
+            return Ok(adopter);
         }
 
-
         /// <summary>
-        /// DELETE ADOPTER BY ID
+        /// Delete adopter by id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">adopter id</param>
+        /// <returns>deleted adopter</returns>
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             var adopter = Adopters.FirstOrDefault(a => a.Id == id);
             if (adopter is null) return NotFound();
             Adopters.Remove(adopter);
-            return NoContent();
+            return Ok(adopter);
         }
     }
 }

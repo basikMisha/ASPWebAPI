@@ -1,0 +1,41 @@
+﻿CREATE DATABASE PETCENTER;
+USE PETCENTER;
+
+CREATE TABLE Volunteer (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100) NOT NULL,
+    Role VARCHAR(50),
+    StartDate DATETIME NOT NULL,
+    Email VARCHAR(100)
+);
+
+CREATE TABLE Pet (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100) NOT NULL,
+    Species VARCHAR(50) NOT NULL,
+    Age INT NOT NULL,
+    IsAdopted BIT NOT NULL,
+    PhotoUrl VARCHAR(255),
+    Description TEXT,
+    VolunteerId INT,
+    CONSTRAINT FK_Pet_Volunteer FOREIGN KEY (VolunteerId) REFERENCES Volunteer(Id)
+);
+
+CREATE TABLE Adopter (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) NOT NULL,
+    Phone VARCHAR(50),
+    AdoptionDate DATETIME NOT NULL
+);
+
+CREATE TABLE AdoptionRequest (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    PetId INT NOT NULL,
+    AdopterId INT NOT NULL,
+    RequestDate DATETIME NOT NULL,
+    Status VARCHAR(50) NOT NULL,
+    CONSTRAINT FK_AdoptionRequest_Pet FOREIGN KEY (PetId) REFERENCES Pet(Id),
+    CONSTRAINT FK_AdoptionRequest_Adopter FOREIGN KEY (AdopterId) REFERENCES Adopter(Id)
+);
+

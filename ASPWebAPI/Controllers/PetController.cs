@@ -1,4 +1,5 @@
-﻿using ASPWebAPI.Models;
+﻿using ASPWebAPI.BLL.Interfaces;
+using ASPWebAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASPWebAPI.Controllers
@@ -11,10 +12,12 @@ namespace ASPWebAPI.Controllers
     [Route("api/[controller]")]
     public class PetController : Controller
     {
-        private static List<Pet> Pets = new List<Pet>
+        private readonly IPetService _petService;
+
+        public PetController(IPetService petService)
         {
-            new Pet { Id = 1, Name = "Charlie", Species = "Dog", Age = 3, isAdopted = false }
-        };
+            _petService = petService;
+        }
 
         /// <summary>
         /// Get all pets
@@ -23,7 +26,8 @@ namespace ASPWebAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Pet>> GetAll()
         {
-            return Ok(Pets);
+            var pets = _petService.GetAll();
+            return Ok(pets);
         }
 
         /// <summary>
@@ -32,8 +36,11 @@ namespace ASPWebAPI.Controllers
         /// <param name="id">pet id</param>
         /// <returns>pet</returns>
         [HttpGet("{id}")]
-        public ActionResult<Pet> GetById(int id) => 
-            Pets.FirstOrDefault(p => p.Id == id) is { } pet ? Ok(pet) : NotFound();
+        public ActionResult<Pet> GetById(int id)
+        {
+            var pet = _petService.GetById(id);
+            return pet is not null ? Ok(pet) : NotFound();
+        }
 
         /// <summary>
         /// Create a new pet
@@ -43,9 +50,8 @@ namespace ASPWebAPI.Controllers
         [HttpPost]
         public ActionResult<Pet> Create(Pet pet)
         {
-            pet.Id = Pets.Max(p => p.Id) + 1;
-            Pets.Add(pet);
-            return CreatedAtAction(nameof(GetById), new { Id = pet.Id }, pet);
+            var created = _petService.Add(pet);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
         /// <summary>
@@ -57,13 +63,8 @@ namespace ASPWebAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Update(int id, Pet updatedPet)
         {
-            var pet = Pets.FirstOrDefault(p => p.Id == id);
-            if (pet is null) return NotFound();
-            pet.Name = updatedPet.Name;
-            pet.Species = updatedPet.Species;
-            pet.Age = updatedPet.Age;
-            pet.isAdopted = updatedPet.isAdopted;
-            return Ok(pet);
+            var updated = _petService.Update(id, updatedPet);
+            return updated is not null ? Ok(updated) : NotFound();
         }
 
         /// <summary>
@@ -74,10 +75,8 @@ namespace ASPWebAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var pet = Pets.FirstOrDefault(p=>p.Id == id);
-            if (pet is null) return NotFound();
-            Pets.Remove(pet);
-            return Ok(pet); 
+            var deleted = _petService.DeleteById(id);
+            return deleted is not null ? Ok(deleted) : NotFound();
         }
     }
 }

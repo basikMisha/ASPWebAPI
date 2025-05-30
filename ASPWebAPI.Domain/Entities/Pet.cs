@@ -1,4 +1,4 @@
-﻿namespace ASPWebAPI.Models
+﻿namespace ASPWebAPI.Domain.Entities
 {
     public class Pet
     {
@@ -7,5 +7,10 @@
         public string Species { get; set; }
         public int Age { get; set; }
         public bool isAdopted {  get; set; }
+        public string? PhotoUrl { get; set; }
+        public string? Description { get; set; }
+        public int? VolunteerId { get; set; }
+        public Volunteer? Volunteer { get; set; }
+        public ICollection<AdoptionRequest>? AdoptionRequests { get; set; }
     }
 }

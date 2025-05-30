@@ -5,11 +5,13 @@ VisualStudioVersion = 17.12.35506.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPWebAPI.Api", "ASPWebAPI\ASPWebAPI.Api.csproj", "{2162AB53-00B7-4227-B3EB-BE056C426946}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPWebAPI.Application", "ASPWebAPI.Application\ASPWebAPI.Application.csproj", "{554E644C-A78A-462E-9220-38F3099F5DBC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPWebAPI.BLL", "ASPWebAPI.Application\ASPWebAPI.BLL.csproj", "{554E644C-A78A-462E-9220-38F3099F5DBC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPWebAPI.Domain", "ASPWebAPI.Domain\ASPWebAPI.Domain.csproj", "{320549FC-9300-4DB9-8FB5-2090FE96EA21}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPWebAPI.Infrastructure", "ASPWebAPI.Infrastructure\ASPWebAPI.Infrastructure.csproj", "{AAC9FF5D-7E24-4720-9E72-A749255D0B85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPWebAPI.DAL", "ASPWebAPI.DAL\ASPWebAPI.DAL.csproj", "{2D9BAEB0-8033-4A85-8F32-AEBA0FBE39E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{AAC9FF5D-7E24-4720-9E72-A749255D0B85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAC9FF5D-7E24-4720-9E72-A749255D0B85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAC9FF5D-7E24-4720-9E72-A749255D0B85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D9BAEB0-8033-4A85-8F32-AEBA0FBE39E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D9BAEB0-8033-4A85-8F32-AEBA0FBE39E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D9BAEB0-8033-4A85-8F32-AEBA0FBE39E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D9BAEB0-8033-4A85-8F32-AEBA0FBE39E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

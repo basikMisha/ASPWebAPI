@@ -1,4 +1,5 @@
-﻿using ASPWebAPI.Models;
+﻿using ASPWebAPI.BLL.Interfaces;
+using ASPWebAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASPWebAPI.Controllers
@@ -11,10 +12,12 @@ namespace ASPWebAPI.Controllers
     [Route("api/[controller]")]
     public class VolunteerController : Controller
     {
-        private static List<Volunteer> Volunteers = new List<Volunteer>
-        {
-            new Volunteer {Id = 1, Name = "Grisha", Role = "nurse", StartDate = new DateTime(2012, 12, 25, 10, 30, 50) }
-        };
+        private readonly IVolunteerService _volunteerService;
+
+        public VolunteerController(IVolunteerService volunteerService) 
+        { 
+            _volunteerService = volunteerService;
+        }
 
         /// <summary>
         /// Get all volunteers
@@ -23,7 +26,8 @@ namespace ASPWebAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Volunteer>> GetAll()
         {
-            return Ok(Volunteers);
+            var volunteers = _volunteerService.GetAll();
+            return Ok(volunteers);
         }
 
         /// <summary>
@@ -32,8 +36,11 @@ namespace ASPWebAPI.Controllers
         /// <param name="id">volunteer id</param>
         /// <returns>volunteer</returns>
         [HttpGet("{id}")]
-        public ActionResult<Volunteer> GetById(int id) =>
-            Volunteers.FirstOrDefault(v => v.Id == id) is { } volunteer ? Ok(volunteer) : NotFound();
+        public ActionResult<Volunteer> GetById(int id)
+        {
+            var volunteer = _volunteerService.GetById(id);
+            return volunteer is not null ? Ok(volunteer) : NotFound();
+        }
 
         /// <summary>
         /// Create a new volunteer
@@ -43,9 +50,8 @@ namespace ASPWebAPI.Controllers
         [HttpPost]
         public ActionResult<Volunteer> Create(Volunteer volunteer)
         {
-            volunteer.Id = Volunteers.Max(v => v.Id) + 1;
-            Volunteers.Add(volunteer);
-            return CreatedAtAction(nameof(GetById), new { Id = volunteer.Id }, volunteer);
+            var created = _volunteerService.Add(volunteer);
+            return CreatedAtAction(nameof(GetById), new {id = created.Id }, created);
         }
 
         /// <summary>
@@ -57,12 +63,8 @@ namespace ASPWebAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Update(int id, Volunteer updatedVolunteer)
         {
-            var volunteer = Volunteers.FirstOrDefault(v => v.Id == id);
-            if (volunteer is null) return NotFound();
-            volunteer.Name = updatedVolunteer.Name;
-            volunteer.StartDate = updatedVolunteer.StartDate;
-            volunteer.Role = updatedVolunteer.Role;
-            return Ok(volunteer);
+            var updated = _volunteerService.Update(id, updatedVolunteer);
+            return updated is not null ? Ok(updated) : NotFound();
         }
 
         /// <summary>
@@ -73,10 +75,8 @@ namespace ASPWebAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var volunteer = Volunteers.FirstOrDefault(v => v.Id == id);
-            if (volunteer is null) return NotFound();
-            Volunteers.Remove(volunteer);
-            return Ok(volunteer);
+            var deleted = _volunteerService.DeleteById(id);
+            return deleted is not null ? Ok(deleted) : NotFound();
         }
 
     }

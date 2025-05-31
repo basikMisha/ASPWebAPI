@@ -1,4 +1,5 @@
-﻿using ASPWebAPI.Models;
+﻿using ASPWebAPI.BLL.Interfaces;
+using ASPWebAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASPWebAPI.Controllers
@@ -11,10 +12,12 @@ namespace ASPWebAPI.Controllers
     [Route("api/[controller]")]
     public class AdopterController : Controller
     {
-        private static List<Adopter> Adopters = new List<Adopter>
+        private readonly IAdopterService _adopterService;
+
+        public AdopterController(IAdopterService adopterService)
         {
-            new Adopter {Id = 1, Name = "Misha", Email = "misha@gmail.com", AdoptionDate = new DateTime(2012, 12, 25, 10, 30, 50) }
-        };
+            _adopterService = adopterService;
+        }
 
         /// <summary>
         /// Get all adopters
@@ -23,7 +26,8 @@ namespace ASPWebAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Adopter>> GetAll()
         {
-            return Ok(Adopters);
+            var adopters = _adopterService.GetAll();
+            return Ok(adopters);
         }
 
         /// <summary>
@@ -32,8 +36,11 @@ namespace ASPWebAPI.Controllers
         /// <param name="id">adopter id</param>
         /// <returns>adopter</returns>
         [HttpGet("{id}")]
-        public ActionResult<Adopter> GetById(int id) =>
-            Adopters.FirstOrDefault(a => a.Id == id) is { } adopter ? Ok(adopter) : NotFound();
+        public ActionResult<Adopter> GetById(int id)
+        {
+            var adopter = _adopterService.GetById(id);
+            return adopter is not null ? Ok(adopter) : NotFound();
+        }
 
         /// <summary>
         /// Create a new adopter
@@ -43,9 +50,8 @@ namespace ASPWebAPI.Controllers
         [HttpPost]
         public ActionResult<Adopter> Create(Adopter adopter)
         {
-            adopter.Id = Adopters.Max(a => a.Id) + 1;
-            Adopters.Add(adopter);
-            return CreatedAtAction(nameof(GetById), new { Id = adopter.Id }, adopter);
+            var created = _adopterService.Add(adopter);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
         /// <summary>
@@ -55,14 +61,10 @@ namespace ASPWebAPI.Controllers
         /// <param name="updatedAdopter">Adopter object with updated values</param>
         /// <returns> updated adopter </returns>
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Adopter updatedAdopter)
+        public ActionResult<Adopter> Update(int id, Adopter updatedAdopter)
         {
-            var adopter = Adopters.FirstOrDefault(a => a.Id == id);
-            if (adopter is null) return NotFound();
-            adopter.Name = updatedAdopter.Name;
-            adopter.Email = updatedAdopter.Email;
-            adopter.AdoptionDate = updatedAdopter.AdoptionDate;
-            return Ok(adopter);
+            var updated = _adopterService.Update(id, updatedAdopter);
+            return updated is not null ? Ok(updated) : NotFound();
         }
 
         /// <summary>
@@ -71,12 +73,10 @@ namespace ASPWebAPI.Controllers
         /// <param name="id">adopter id</param>
         /// <returns>deleted adopter</returns>
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public ActionResult<Adopter> Delete(int id)
         {
-            var adopter = Adopters.FirstOrDefault(a => a.Id == id);
-            if (adopter is null) return NotFound();
-            Adopters.Remove(adopter);
-            return Ok(adopter);
+            var deleted = _adopterService.DeleteById(id);
+            return deleted is not null ? Ok(deleted) : NotFound();
         }
     }
 }

@@ -1,53 +1,70 @@
 ﻿using ASPWebAPI.Domain.Interfaces;
 using ASPWebAPI.Domain.Entities;
+using System.Data;
+using Dapper;
+
 namespace ASPWebAPI.DAL.Repositories
 {
     public class PetRepository : IPetRepository
     {
-        private List<Pet> _pets = new()
+        private readonly IDbConnection _db;
+
+        public PetRepository(IDbConnection db)
         {
-            new Pet { Id = 1, Species = "dog", Age = 12, Description = "dog", isAdopted = false, VolunteerId =  1}
-        };
+            _db = db;
+        }
 
-        public IEnumerable<Pet> GetAll() => _pets;
-
-        public Pet GetById(int id) => _pets.FirstOrDefault(p => p.Id == id);
-
-        public Pet Add(Pet pet)
+        public async Task<IEnumerable<Pet>> GetAllAsync()
         {
-            pet.Id = _pets.Max(p => p.Id) + 1;
-            _pets.Add(pet);
+            var sql = "SELECT * FROM adoption.Pet";
+            return await _db.QueryAsync<Pet>(sql);
+        }
+
+        public async Task<Pet> GetByIdAsync(int id)
+        {
+            var sql = "SELECT * FROM adoption.Pet WHERE Id = @id";
+            return await _db.QuerySingleOrDefaultAsync<Pet>(sql, new { Id = id });
+        }
+
+        public async Task<Pet> AddAsync(Pet pet)
+        {
+            var sql = @"INSERT INTO adoption.Pet(Name, Species, Age, IsAdopted, PhotoUrl, Description, VolunteerId)
+                      VALUES (@Name, @Species, @Age, @IsAdopted, @PhotoUrl, @Description, @VolunteerId);
+                      SELECT CAST(SCOPE_IDENTITY() as int);";
+            var id = await _db.ExecuteScalarAsync<int>(sql, pet);
+            pet.Id = id;
             return pet;
         }
 
-        public Pet Update(int id, Pet updatedPet)
+        public async Task<Pet> UpdateAsync(Pet pet)
         {
-            var pet = _pets.FirstOrDefault(p => p.Id == id);
+            var existing = await GetByIdAsync(pet.Id);
+
+            if (existing == null) return null;
+
+            var sql = @"UPDATE adoption.Pet
+                      SET Name = @Name,
+                      Species = @Species,
+                      Age = @Age,
+                      IsAdopted = @IsAdopted,
+                      PhotoUrl = @PhotoUrl,
+                      Description = @Description,
+                      VolunteerId = @VolunteerId
+                      WHERE Id = @Id";
+            await _db.ExecuteAsync(sql, pet);
+            return pet;
+        }
+
+        public async Task<Pet> DeleteByIdAsync(int id)
+        {
+            var pet = await GetByIdAsync(id);
+
             if (pet == null) return null;
-            pet.Species = updatedPet.Species;
-            pet.Age = updatedPet.Age;
-            pet.Description = updatedPet.Description;
-            pet.isAdopted = updatedPet.isAdopted;
-            pet.PhotoUrl = updatedPet.PhotoUrl;
-            pet.VolunteerId = updatedPet.VolunteerId;
 
-            if(updatedPet.Volunteer is not null)
-            {
-                pet.Volunteer = updatedPet.Volunteer;
-            }
+            var sql = "DELETE FROM adoption.Pet WHERE Id = @Id";
+            await _db.ExecuteAsync(sql, new { Id = id });
 
             return pet;
         }
-
-        public Pet DeleteById(int id)
-        {
-            var pet = _pets.FirstOrDefault(p => p.Id == id);
-            if(pet is not null)
-            {
-                _pets.Remove(pet);
-            }
-            return pet;
-        }
-
     }
 }

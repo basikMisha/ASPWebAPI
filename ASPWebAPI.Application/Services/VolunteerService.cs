@@ -13,24 +13,38 @@ namespace ASPWebAPI.BLL.Services
             _repo = repo;
         }
 
-        public IEnumerable<Volunteer> GetAll() => _repo.GetAll();
-
-        public Volunteer GetById(int id) => _repo.GetById(id);
-
-        public Volunteer Add(Volunteer volunteer)
+        public async Task<IEnumerable<Volunteer>> GetAllAsync()
         {
-            _repo.Add(volunteer);
-            return volunteer;
+            return await _repo.GetAllAsync();
         }
 
-        public Volunteer Update(int id, Volunteer updatedVolunteer)
+        public async Task<Volunteer> GetByIdAsync(int id)
         {
-            var volunteer = _repo.GetById(id);
-            if (volunteer == null) return null;
-            volunteer.Id = id;
-            return _repo.Update(id, updatedVolunteer);
+            return await _repo.GetByIdAsync(id);
         }
 
-        public Volunteer DeleteById(int id) => _repo.DeleteById(id);
+        public async Task<Volunteer> AddAsync(Volunteer volunteer)
+        {
+            return await _repo.AddAsync(volunteer);
+        }
+
+        public async Task<Volunteer> UpdateAsync(int id, Volunteer updatedVolunteer)
+        {
+            var existingVolunteer = await _repo.GetByIdAsync(id);
+
+            if (existingVolunteer == null) return null;
+            
+            existingVolunteer.Name = updatedVolunteer.Name;
+            existingVolunteer.Role = updatedVolunteer.Role;
+            existingVolunteer.StartDate = updatedVolunteer.StartDate;
+            existingVolunteer.Email = updatedVolunteer.Email;
+
+            return await _repo.UpdateAsync(existingVolunteer);
+        }
+
+        public async Task<Volunteer> DeleteByIdAsync(int id)
+        {
+            return await _repo.DeleteByIdAsync(id);
+        }
     }
 }

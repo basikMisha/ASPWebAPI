@@ -1,49 +1,66 @@
 ﻿using ASPWebAPI.Domain.Entities;
 using ASPWebAPI.Domain.Interfaces;
+using Dapper;
+using System.Data;
 
 namespace ASPWebAPI.DAL.Repositories
 {
     public class VolunteerRepository : IVolunteerRepository
     {
-        private List<Volunteer> _volunteers = new()
+        private readonly IDbConnection _db;
+
+        public VolunteerRepository(IDbConnection db)
         {
-            new Volunteer {Id = 1, Name = "Misha", Email = "test@gmail.com", Role = "nurse", StartDate = DateTime.Now, Pets = {} }
-        };
+            _db = db;
+        }
 
-        public IEnumerable<Volunteer> GetAll() => _volunteers;
-
-        public Volunteer GetById(int id) => _volunteers.FirstOrDefault(v => v.Id == id);
-
-        public Volunteer Add(Volunteer volunteer)
+        public async Task<IEnumerable<Volunteer>> GetAllAsync()
         {
-            volunteer.Id = _volunteers.Max(v => v.Id) + 1;
-            _volunteers.Add(volunteer);
+            var sql = "SELECT * FROM roles.Volunteer";
+            return await _db.QueryAsync<Volunteer>(sql);
+        }
+
+        public async Task<Volunteer> GetByIdAsync(int id)
+        {
+            var sql = "SELECT * FROM roles.Volunteer WHERE Id = @id";
+            return await _db.QuerySingleOrDefaultAsync<Volunteer>(sql, new { Id = id });
+        }
+
+        public async Task<Volunteer> AddAsync(Volunteer volunteer)
+        {
+            var sql = @"INSERT INTO roles.Volunteer (Name, Role, StartDate, Email)
+                      VALUES (@Name, @Role, @StartDate, @Email);
+                      SELECT CAST(SCOPE_IDENTITY() as int);";
+            var id = await _db.ExecuteScalarAsync<int>(sql, volunteer);
+            volunteer.Id = id;
             return volunteer;
         }
 
-        public Volunteer Update(int id, Volunteer updatedVolunteer)
+        public async Task<Volunteer> UpdateAsync(Volunteer volunteer)
         {
-            var volunteer = _volunteers.FirstOrDefault(v => v.Id == id);
+            var existing = await GetByIdAsync(volunteer.Id);
+
+            if (existing == null) return null;
+
+            var sql = @"UPDATE roles.Volunteer
+                      SET Name = @Name,
+                      Role = @Role,
+                      StartDate = StartDate,
+                      Email = @Email
+                      WHERE Id = @Id";
+            await _db.ExecuteAsync(sql, volunteer);
+            return volunteer;
+        }
+
+        public async Task<Volunteer> DeleteByIdAsync(int id)
+        {
+            var volunteer = await GetByIdAsync(id);
+
             if (volunteer == null) return null;
-            volunteer.Name = updatedVolunteer.Name;
-            volunteer.Email = updatedVolunteer.Email;
-            volunteer.Role = updatedVolunteer.Role;
-            volunteer.StartDate = updatedVolunteer.StartDate;
 
-            if(updatedVolunteer.Pets is not null)
-            {
-                volunteer.Pets = updatedVolunteer.Pets;
-            }
-            return volunteer;
-        }
+            var sql = "DELETE FROM roles.Volunteer WHERE Id = @Id";
+            await _db.ExecuteAsync(sql, new { Id = id });
 
-        public Volunteer DeleteById(int id)
-        {
-            var volunteer = _volunteers.FirstOrDefault(v => v.Id==id);
-            if (volunteer is not null)
-            {
-                _volunteers.Remove(volunteer);
-            }
             return volunteer;
         }
     }

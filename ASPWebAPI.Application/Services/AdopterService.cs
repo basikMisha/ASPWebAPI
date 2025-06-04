@@ -13,24 +13,30 @@ namespace ASPWebAPI.BLL.Services
             _repo = repo;
         }
 
-        public IEnumerable<Adopter> GetAll() => _repo.GetAll();
-
-        public Adopter GetById(int id) => _repo.GetById(id);
-
-        public Adopter Add(Adopter adopter)
+        public async Task<IEnumerable<Adopter>> GetAllAsync()
         {
-            _repo.Add(adopter);
-            return adopter;
+            return await _repo.GetAllAsync();
         }
 
-        public Adopter Update(int id, Adopter updatedAdopter)
+        public async Task<Adopter> GetByIdAsync(int id)
         {
-            var adopter = _repo.GetById(id);
-            if (adopter == null) return null;
-            adopter.Id = id;
-            return _repo.Update(id, updatedAdopter);
+            return await _repo.GetByIdAsync(id);
         }
 
-        public Adopter DeleteById(int id) => _repo.DeleteById(id);
+        public async Task<Adopter> AddAsync(Adopter adopter)
+        {
+            return await _repo.AddAsync(adopter);
+        }
+
+        public async Task<Adopter> UpdateAsync(int id, Adopter updatedAdopter)
+        {
+            updatedAdopter.Id = id;
+            return await _repo.UpdateAsync(updatedAdopter);
+        }
+
+        public async Task<Adopter> DeleteByIdAsync(int id)
+        {
+            return await _repo.DeleteByIdAsync(id);
+        }
     }
 }

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPWebAPI.Infrastructure", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPWebAPI.DAL", "ASPWebAPI.DAL\ASPWebAPI.DAL.csproj", "{2D9BAEB0-8033-4A85-8F32-AEBA0FBE39E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPWebAPI.DTOs", "ASPWebAPI.DTOs\ASPWebAPI.DTOs.csproj", "{BE5B0790-62E9-43F5-919B-72AFFEB6189F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{2D9BAEB0-8033-4A85-8F32-AEBA0FBE39E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D9BAEB0-8033-4A85-8F32-AEBA0FBE39E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D9BAEB0-8033-4A85-8F32-AEBA0FBE39E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE5B0790-62E9-43F5-919B-72AFFEB6189F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE5B0790-62E9-43F5-919B-72AFFEB6189F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE5B0790-62E9-43F5-919B-72AFFEB6189F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE5B0790-62E9-43F5-919B-72AFFEB6189F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

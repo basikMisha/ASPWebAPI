@@ -17,8 +17,7 @@ CREATE TABLE roles.Adopter (
     Id INT PRIMARY KEY IDENTITY(1,1),
     Name VARCHAR(100) NOT NULL,
     Email VARCHAR(100) NOT NULL,
-    Phone VARCHAR(50),
-    AdoptionDate DATETIME NOT NULL
+    Phone VARCHAR(50),   
 );
 
 CREATE TABLE adoption.Pet (
@@ -38,6 +37,7 @@ CREATE TABLE adoption.AdoptionRequest (
     PetId INT NOT NULL,
     AdopterId INT NOT NULL,
     RequestDate DATETIME NOT NULL,
+	AdoptionDate DATETIME,
     Status VARCHAR(50) NOT NULL,
     CONSTRAINT FK_AdoptionRequest_Pet FOREIGN KEY (PetId) REFERENCES adoption.Pet(Id),
     CONSTRAINT FK_AdoptionRequest_Adopter FOREIGN KEY (AdopterId) REFERENCES roles.Adopter(Id)

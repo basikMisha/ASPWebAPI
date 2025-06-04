@@ -1,56 +1,68 @@
 ﻿using ASPWebAPI.Domain.Entities;
 using ASPWebAPI.Domain.Interfaces;
+using Dapper;
+using System.Data;
 
 
 namespace ASPWebAPI.DAL.Repositories
 {
     public class AdoptionRequestRepository : IAdoptionRequestRepository
     {
-        private List<AdoptionRequest> _requests = new()
+        private readonly IDbConnection _db;
+
+        public AdoptionRequestRepository(IDbConnection db)
         {
-            new AdoptionRequest {Id = 1, AdopterId = 1, PetId = 1, RequestDate = DateTime.Now, Status = "approved"}
-        };
+            _db = db;
+        }
 
-        public IEnumerable<AdoptionRequest> GetAll() => _requests;
-
-        public AdoptionRequest GetById(int id) => _requests.FirstOrDefault(ar => ar.Id == id);
-
-        public AdoptionRequest Add(AdoptionRequest adoptionRequest)
+        public async Task<IEnumerable<AdoptionRequest>> GetAllAsync()
         {
-            adoptionRequest.Id = _requests.Max(ar => ar.Id) + 1;
-            _requests.Add(adoptionRequest);
+            var sql = "SELECT * FROM adoption.AdoptionRequest";
+            return await _db.QueryAsync<AdoptionRequest>(sql);
+        }
+
+        public async Task<AdoptionRequest> GetByIdAsync(int id)
+        {
+            var sql = "SELECT * FROM adoption.AdoptionRequest WHERE Id = @id";
+            return await _db.QuerySingleOrDefaultAsync<AdoptionRequest>(sql, new { Id = id });
+        }
+
+        public async Task<AdoptionRequest> AddAsync(AdoptionRequest adoptionRequest)
+        {
+            var sql = @"INSERT INTO adoption.AdoptionRequest (PetId, AdopterId, RequestDate, AdoptionDate, Status)
+                      VALUES(@PetId, @AdopterId, @RequestDate, @AdoptionDate, @Status);
+                      SELECT CAST(SCOPE_IDENTITY() as int);";
+            var id = await _db.ExecuteScalarAsync<int>(sql, adoptionRequest);
+            adoptionRequest.Id = id;
             return adoptionRequest;
         }
 
-        public AdoptionRequest Update(int id, AdoptionRequest updatedAdoptionRequest) 
+        public async Task<AdoptionRequest> UpdateAsync(AdoptionRequest adoptionRequest)
         {
-            var adoptionRequest = _requests.FirstOrDefault(ar => ar.Id == id);
+            var existing = await GetByIdAsync(adoptionRequest.Id);
+
+            if (existing == null) return null;
+
+            var sql = @"UPDATE adoption.AdoptionRequest
+                      SET PetId = @PetId,
+                      AdopterId = @AdopterId,
+                      RequestDate = @RequestDate,
+                      AdoptionDate = @AdoptionDate,
+                      Status = @Status
+                      WHERE Id = @Id";
+            await _db.ExecuteAsync(sql, adoptionRequest);
+            return adoptionRequest;
+        }
+
+        public async Task<AdoptionRequest> DeleteByIdAsync(int id)
+        {
+            var adoptionRequest = await GetByIdAsync(id);
+
             if (adoptionRequest == null) return null;
 
-            adoptionRequest.AdopterId = updatedAdoptionRequest.AdopterId;
-            adoptionRequest.PetId = updatedAdoptionRequest.PetId;
-            adoptionRequest.RequestDate = updatedAdoptionRequest.RequestDate;
-            adoptionRequest.Status = updatedAdoptionRequest.Status;
-
-            if(updatedAdoptionRequest.Adopter is not null)
-            {
-                adoptionRequest.Adopter = updatedAdoptionRequest.Adopter;
-            }
-            if(updatedAdoptionRequest.Pet is not null)
-            {
-                adoptionRequest.Pet = updatedAdoptionRequest.Pet;
-            }
-
-            return adoptionRequest;
-        }
-
-        public AdoptionRequest DeleteById(int id)
-        {
-            var adoptionRequest = _requests.FirstOrDefault(ar => ar.Id == id);
-            if(adoptionRequest is not null)
-            {
-                _requests.Remove(adoptionRequest);
-            }
+            var sql = "DELETE FROM adoption.AdoptionRequest WHERE Id = @Id";
+            await _db.ExecuteAsync(sql, new { Id = id });
+            
             return adoptionRequest;
         }
     }

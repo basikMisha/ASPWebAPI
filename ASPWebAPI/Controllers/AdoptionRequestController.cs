@@ -1,5 +1,7 @@
 ﻿using ASPWebAPI.BLL.Interfaces;
 using ASPWebAPI.Domain.Entities;
+using ASPWebAPI.DTOs.AdoptionRequest;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASPWebAPI.Controllers
@@ -13,10 +15,12 @@ namespace ASPWebAPI.Controllers
     public class AdoptionRequestController : Controller
     {
         private readonly IAdoptionRequestService _adoptionRequestService;
+        private readonly IMapper _mapper;
 
-        public AdoptionRequestController(IAdoptionRequestService adoptionRequestService)
+        public AdoptionRequestController(IAdoptionRequestService adoptionRequestService, IMapper mapper)
         {
             _adoptionRequestService = adoptionRequestService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -24,10 +28,10 @@ namespace ASPWebAPI.Controllers
         /// </summary>
         /// <returns>adoption requests</returns>
         [HttpGet]
-        public ActionResult<IEnumerable<AdoptionRequest>> GetAll()
+        public async Task<ActionResult<IEnumerable<AdoptionRequestDto>>> GetAll()
         {
-            var adoptionRequests = _adoptionRequestService.GetAll();
-            return Ok(adoptionRequests);
+            var adoptionRequests = await _adoptionRequestService.GetAllAsync();
+            return Ok(_mapper.Map<IEnumerable<AdoptionRequestDto>>(adoptionRequests));
         }
 
         /// <summary>
@@ -36,35 +40,42 @@ namespace ASPWebAPI.Controllers
         /// <param name="id">adoption request id</param>
         /// <returns>adoption request</returns>
         [HttpGet("{id}")]
-        public ActionResult<AdoptionRequest> GetById(int id)
+        public async Task<ActionResult<AdoptionRequestDto>> GetById(int id)
         {
-            var adoptionRequest = _adoptionRequestService.GetById(id);
-            return adoptionRequest is not null ? Ok(adoptionRequest) : NotFound();
+            var adoptionRequest = await _adoptionRequestService.GetByIdAsync(id);
+            return adoptionRequest is not null
+                ? Ok(_mapper.Map<AdoptionRequestDto>(adoptionRequest))
+                : NotFound();
         }
 
         /// <summary>
         /// Create a new adoption request
         /// </summary>
-        /// <param name="adoptionRequest">Adoption request object with petId, adopterId, requestDate and status</param>
+        /// <param name="createDto">Adoption request object with petId, adopterId, requestDate and status</param>
         /// <returns>new adoption request</returns>
         [HttpPost]
-        public ActionResult<AdoptionRequest> Create(AdoptionRequest adoptionRequest)
+        public async Task<ActionResult<AdoptionRequestDto>> Create([FromBody] CreateAdoptionRequestDto createDto)
         {
-            var created = _adoptionRequestService.Add(adoptionRequest);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            var adoptionRequest = _mapper.Map<AdoptionRequest>(createDto);
+            var created = await _adoptionRequestService.AddAsync(adoptionRequest);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id },
+                _mapper.Map<AdoptionRequestDto>(created));
         }
 
         /// <summary>
         /// Update adoption request by id
         /// </summary>
         /// <param name="id">adoption request id</param>
-        /// <param name="updatedAdoptionRequest">Adoption request object with updated values</param>
+        /// <param name="updateDto">Adoption request object with updated values</param>
         /// <returns> updated adoption request </returns>
         [HttpPut("{id}")]
-        public IActionResult Update(int id, AdoptionRequest updatedAdoptionRequest)
+        public async Task<ActionResult<AdoptionRequestDto>> Update(int id, [FromBody] UpdateAdoptionRequestDto updateDto)
         {
-            var updated = _adoptionRequestService.Update(id, updatedAdoptionRequest);
-            return updated is not null ? Ok(updated) : NotFound();
+            var adoptionRequest = _mapper.Map<AdoptionRequest>(updateDto);
+            var updated = await _adoptionRequestService.UpdateAsync(id, adoptionRequest);
+            return updated is not null
+                ? Ok(_mapper.Map<AdoptionRequestDto>(updated))
+                : NotFound();
         }
 
         /// <summary>
@@ -73,10 +84,12 @@ namespace ASPWebAPI.Controllers
         /// <param name="id">adoption request id</param>
         /// <returns> deleted adoption request </returns>
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<ActionResult<AdoptionRequestDto>> Delete(int id)
         {
-            var deleted = _adoptionRequestService.DeleteById(id);
-            return deleted is not null ? Ok(deleted) : NotFound();
+            var deleted = await _adoptionRequestService.DeleteByIdAsync(id);
+            return deleted is not null
+                ? Ok(_mapper.Map<AdoptionRequestDto>(deleted))
+                : NotFound();
         }
     }
 }

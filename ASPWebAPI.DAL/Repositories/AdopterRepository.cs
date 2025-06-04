@@ -1,52 +1,68 @@
 ﻿using ASPWebAPI.Domain.Entities;
 using ASPWebAPI.Domain.Interfaces;
+using System.Data;
+using Dapper;
 
 namespace ASPWebAPI.DAL.Repositories
 {
     public class AdopterRepository : IAdopterRepository
     {
-        private List<Adopter> _adopters = new()
+        private readonly IDbConnection _db;
+
+        public AdopterRepository(IDbConnection db)
         {
-            new Adopter {Id = 1, Name = "Misha", Email = "test@gmail.com", AdoptionDate = DateTime.Now, }
-        };
+            _db = db;
+        }
 
-        public IEnumerable<Adopter> GetAll() => _adopters;
-
-        public Adopter GetById(int id) => _adopters.FirstOrDefault(a => a.Id == id);
-
-        public Adopter Add(Adopter adopter)
+        public async Task<IEnumerable<Adopter>> GetAllAsync()
         {
-            adopter.Id = _adopters.Max(a => a.Id) + 1;
-            _adopters.Add(adopter);
+            var sql = "SELECT * FROM roles.Adopter";
+            return await _db.QueryAsync<Adopter>(sql);
+        }
+
+        public async Task<Adopter> GetByIdAsync(int id)
+        {
+            var sql = "SELECT * FROM roles.Adopter WHERE Id = @id";
+            return await _db.QuerySingleOrDefaultAsync<Adopter>(sql, new { Id = id });
+        }
+
+        public async Task<Adopter> AddAsync(Adopter adopter)
+        {
+            var sql = @"INSERT INTO roles.Adopter (Name, Email, Phone)
+                      VALUES (@Name, @Email, @Phone);
+                      SELECT CAST(SCOPE_IDENTITY() as int);";
+
+            var id = await _db.ExecuteScalarAsync<int>(sql, adopter);
+            adopter.Id = id;
             return adopter;
         }
 
-        public Adopter Update(int id, Adopter updatedAdopter)
+        public async Task<Adopter> UpdateAsync(Adopter adopter)
         {
-            var adopter = _adopters.FirstOrDefault(a => a.Id == id);
+            var existing = await GetByIdAsync(adopter.Id);
+
+            if (existing == null) return null;
+
+            var sql = @"UPDATE roles.Adopter
+                      SET Name = @Name,
+                      Email = @Email,
+                      Phone = @Phone
+                      WHERE Id = @Id";
+            await _db.ExecuteAsync(sql, adopter);
+            return adopter;
+        }
+
+
+        public async Task<Adopter> DeleteByIdAsync(int id)
+        {
+            var adopter = await GetByIdAsync(id);
+
             if (adopter == null) return null;
-            adopter.Name = updatedAdopter.Name;
-            adopter.Email = updatedAdopter.Email;
-            adopter.AdoptionDate = updatedAdopter.AdoptionDate;
-            adopter.Phone = updatedAdopter?.Phone;
 
-            if (updatedAdopter.AdoptionRequests is not null)
-            {
-                adopter.AdoptionRequests = updatedAdopter.AdoptionRequests;
-            }
+            var sql = "DELETE FROM roles.Adopter WHERE Id = @Id";
+            await _db.ExecuteAsync(sql, new { Id = id });
 
             return adopter;
         }
-
-        public Adopter DeleteById(int id)
-        {
-            var adopter = _adopters.FirstOrDefault(a => a.Id == id);
-            if(adopter is not null)
-            {
-                _adopters.Remove(adopter);
-            }
-            return adopter;
-        }
-
     }
 }

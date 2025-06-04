@@ -1,5 +1,7 @@
 ﻿using ASPWebAPI.BLL.Interfaces;
 using ASPWebAPI.Domain.Entities;
+using ASPWebAPI.DTOs.Volunteer;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASPWebAPI.Controllers
@@ -13,10 +15,12 @@ namespace ASPWebAPI.Controllers
     public class VolunteerController : Controller
     {
         private readonly IVolunteerService _volunteerService;
+        private readonly IMapper _mapper;
 
-        public VolunteerController(IVolunteerService volunteerService) 
+        public VolunteerController(IVolunteerService volunteerService, IMapper mapper) 
         { 
             _volunteerService = volunteerService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -24,10 +28,10 @@ namespace ASPWebAPI.Controllers
         /// </summary>
         /// <returns>volunteers</returns>
         [HttpGet]
-        public ActionResult<IEnumerable<Volunteer>> GetAll()
+        public async Task<ActionResult<IEnumerable<VolunteerDto>>> GetAll()
         {
-            var volunteers = _volunteerService.GetAll();
-            return Ok(volunteers);
+            var volunteers = await _volunteerService.GetAllAsync();
+            return Ok(_mapper.Map<IEnumerable<VolunteerDto>>(volunteers));
         }
 
         /// <summary>
@@ -36,35 +40,42 @@ namespace ASPWebAPI.Controllers
         /// <param name="id">volunteer id</param>
         /// <returns>volunteer</returns>
         [HttpGet("{id}")]
-        public ActionResult<Volunteer> GetById(int id)
+        public async Task<ActionResult<VolunteerDto>> GetById(int id)
         {
-            var volunteer = _volunteerService.GetById(id);
-            return volunteer is not null ? Ok(volunteer) : NotFound();
+            var volunteer = await _volunteerService.GetByIdAsync(id);
+            return volunteer is not null 
+                ? Ok(_mapper.Map<VolunteerDto>(volunteer)) 
+                : NotFound();
         }
 
         /// <summary>
         /// Create a new volunteer
         /// </summary>
-        /// <param name="volunteer">Volunteer object with name, role and startDate</param>
+        /// <param name="createDto">Volunteer object with name, role, email and startDate</param>
         /// <returns>new volunteer</returns>
         [HttpPost]
-        public ActionResult<Volunteer> Create(Volunteer volunteer)
+        public async Task<ActionResult<VolunteerDto>> Create([FromBody] CreateVolunteerDto createDto)
         {
-            var created = _volunteerService.Add(volunteer);
-            return CreatedAtAction(nameof(GetById), new {id = created.Id }, created);
+            var volunteer = _mapper.Map<Volunteer>(createDto);
+            var created = await _volunteerService.AddAsync(volunteer);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id },
+                _mapper.Map<VolunteerDto>(created));
         }
 
         /// <summary>
         /// Update volunteer by id
         /// </summary>
         /// <param name="id">volunteer id</param>
-        /// <param name="updatedVolunteer">Volunteer object with updated values</param>
+        /// <param name="updateDto">Volunteer object with updated values</param>
         /// <returns>updated vounteer</returns>
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Volunteer updatedVolunteer)
+        public async Task<ActionResult<VolunteerDto>> Update(int id, [FromBody] UpdateVolunteerDto updateDto)
         {
-            var updated = _volunteerService.Update(id, updatedVolunteer);
-            return updated is not null ? Ok(updated) : NotFound();
+            var volunteer = _mapper.Map<Volunteer>(updateDto);
+            var updated = await _volunteerService.UpdateAsync(id, volunteer);
+            return updated is not null
+                ? Ok(_mapper.Map<VolunteerDto>(updated))
+                : NotFound();
         }
 
         /// <summary>
@@ -73,10 +84,12 @@ namespace ASPWebAPI.Controllers
         /// <param name="id">volunteer id</param>
         /// <returns>deleted volunteer</returns>
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<ActionResult<VolunteerDto>> Delete(int id)
         {
-            var deleted = _volunteerService.DeleteById(id);
-            return deleted is not null ? Ok(deleted) : NotFound();
+            var deleted = await _volunteerService.DeleteByIdAsync(id);
+            return deleted is not null
+                ? Ok(_mapper.Map<VolunteerDto>(deleted))
+                : NotFound();
         }
 
     }

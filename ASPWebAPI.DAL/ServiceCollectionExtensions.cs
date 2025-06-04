@@ -6,7 +6,7 @@ namespace ASPWebAPI.DAL
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddDALServices(this IServiceCollection services) 
+        public static void AddDapperDalServices(this IServiceCollection services) 
         { 
             services.AddScoped<IAdopterRepository, AdopterRepository>();
             services.AddScoped<IVolunteerRepository, VolunteerRepository>();

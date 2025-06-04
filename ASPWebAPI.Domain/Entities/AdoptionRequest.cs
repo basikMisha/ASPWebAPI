@@ -9,6 +9,6 @@
         public Adopter? Adopter { get; set; }
         public DateTime RequestDate { get; set; }
         public DateTime? AdoptionDate { get; set; }
-        public AdoptionRequestStatus Status { get; set; }
+        public string Status { get; set; }
     }
 }

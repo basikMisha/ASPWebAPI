@@ -6,18 +6,14 @@ using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Reflection;
 using ASPWebAPI.Api.Validators.Adopter;
-using ASPWebAPI.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Controllers
 builder.Services.AddControllers();
 
-//DAL
-builder.Services.AddDALServices();
-
 //BLL
-builder.Services.AddBLLServices();
+builder.Services.AddBLLServices(builder.Configuration);
 
 //Database connection
 builder.Services.AddScoped<IDbConnection>(sp =>

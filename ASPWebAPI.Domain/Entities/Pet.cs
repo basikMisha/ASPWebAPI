@@ -6,7 +6,7 @@
         public string Name { get; set; }
         public string Species { get; set; }
         public int Age { get; set; }
-        public bool isAdopted {  get; set; }
+        public bool IsAdopted {  get; set; }
         public string? PhotoUrl { get; set; }
         public string? Description { get; set; }
         public int? VolunteerId { get; set; }

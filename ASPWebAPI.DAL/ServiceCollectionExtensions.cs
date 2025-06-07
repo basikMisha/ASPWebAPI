@@ -1,4 +1,5 @@
-﻿using ASPWebAPI.DAL.Repositories;
+﻿using ASPWebAPI.DAL.Dapper.Repositories;
+using ASPWebAPI.DAL.Repositories;
 using ASPWebAPI.Domain.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,7 @@ namespace ASPWebAPI.DAL
             services.AddScoped<IVolunteerRepository, VolunteerRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
             services.AddScoped<IAdoptionRequestRepository, AdoptionRequestRepository>();
+            services.AddScoped<IUserRepository,UserRepository>();
         }
     }
 }

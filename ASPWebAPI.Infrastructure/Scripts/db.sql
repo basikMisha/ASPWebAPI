@@ -5,12 +5,21 @@ CREATE SCHEMA roles;
 
 CREATE SCHEMA adoption;
 
+CREATE SCHEMA auth;
+
 CREATE TABLE roles.Volunteer (
     Id INT PRIMARY KEY IDENTITY(1,1),
     Name VARCHAR(100) NOT NULL,
     Role VARCHAR(50),
     StartDate DATETIME NOT NULL,
     Email VARCHAR(100)
+);
+
+CREATE TABLE auth.[User] (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Email VARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    Role VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE roles.Adopter (

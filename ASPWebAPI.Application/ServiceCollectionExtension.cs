@@ -21,7 +21,7 @@ namespace ASPWebAPI.BLL
             {
                 services.AddDapperDalServices();
             }
-
+            services.AddDapperDalServices();
             services.AddScoped<IAdopterService, AdopterService>();
 
             services.AddScoped<IVolunteerService, VolunteerService>();
@@ -29,6 +29,9 @@ namespace ASPWebAPI.BLL
             services.AddScoped<IPetService, PetService>();
 
             services.AddScoped<IAdoptionRequestService, AdoptionRequestService>();
+
+            services.AddScoped<JwtService>();
+            services.AddScoped<AuthService>();
         }
     }
 }

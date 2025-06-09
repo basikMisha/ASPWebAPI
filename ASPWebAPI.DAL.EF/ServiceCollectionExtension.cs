@@ -18,6 +18,7 @@ namespace ASPWebAPI.DAL.EF
             services.AddScoped<IPetRepository, PetRepository>();
             services.AddScoped<IVolunteerRepository, VolunteerRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         }
 
     }

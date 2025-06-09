@@ -22,6 +22,14 @@ CREATE TABLE auth.[User] (
     Role VARCHAR(50) NOT NULL
 );
 
+CREATE TABLE auth.RefreshToken (
+    Id INT PRIMARY KEY IDENTITY,
+    Token NVARCHAR(100) NOT NULL,
+    Expires DATETIME NOT NULL,
+    IsRevoked BIT NOT NULL,
+    UserId INT NOT NULL FOREIGN KEY REFERENCES auth.[User](Id)
+);
+
 CREATE TABLE roles.Adopter (
     Id INT PRIMARY KEY IDENTITY(1,1),
     Name VARCHAR(100) NOT NULL,

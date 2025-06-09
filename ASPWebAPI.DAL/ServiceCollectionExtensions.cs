@@ -13,7 +13,8 @@ namespace ASPWebAPI.DAL
             services.AddScoped<IVolunteerRepository, VolunteerRepository>();
             services.AddScoped<IPetRepository, PetRepository>();
             services.AddScoped<IAdoptionRequestRepository, AdoptionRequestRepository>();
-            services.AddScoped<IUserRepository,UserRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         }
     }
 }

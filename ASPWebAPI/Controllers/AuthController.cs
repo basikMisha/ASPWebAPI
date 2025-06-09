@@ -21,9 +21,10 @@ namespace ASPWebAPI.Api.Controllers
 
         /// <summary>
         /// Register user with default role User
-        /// Returns 400 if the user already exists.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// Returns 400 if the user already exists.
+        /// </returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserSimpleRegisterDto dto)
         {
@@ -36,9 +37,10 @@ namespace ASPWebAPI.Api.Controllers
 
         /// <summary>
         /// Login with email and password
-        /// Returns a Jwt token if successful, 401 otherwise.
         /// </summary>
-        /// <returns>adopters</returns>
+        /// <returns>
+        /// Returns a Jwt token if successful, 401 otherwise.
+        /// </returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginDto dto)
         {
@@ -46,15 +48,21 @@ namespace ASPWebAPI.Api.Controllers
             if (token == null)
                 return Unauthorized("Invalid email or password");
 
-            return Ok(new { Token = token });
+            var (accessToken, refreshToken) = token.Value;
+            return Ok(new TokenResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            });
         }
 
         /// <summary>
         /// Allows an admin to register a new user with a specified role.
         /// Requires the caller to be authorized with the "Admin" role.
-        /// Returns 400 if the user already exists
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// Returns 400 if the user already exists
+        /// </returns>
         [HttpPost("admin/register")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RegisterWithRole([FromBody] UserRegisterDto dto)
@@ -64,6 +72,47 @@ namespace ASPWebAPI.Api.Controllers
                 return BadRequest("User already exists");
 
             return Ok($"User with role '{dto.Role}' created successfully");
+        }
+
+        /// <summary>
+        /// Generates a new JWT access token using a valid refresh token.
+        /// </summary>
+        /// <param name="dto">Request containing the refresh token.</param>
+        /// <returns>
+        /// Returns 200 OK with new access and refresh tokens;  
+        /// Returns 401 Unauthorized if the refresh token is invalid or expired.
+        /// </returns>
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto dto)
+        {
+            var result = await _authService.RefreshAsync(dto.RefreshToken);
+            if (result == null)
+                return Unauthorized();
+
+            var (accessToken, refreshToken) = result.Value;
+            return Ok(new TokenResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            });
+        }
+
+        /// <summary>
+        /// Revokes an existing refresh token, preventing its further use.
+        /// </summary>
+        /// <param name="dto">Request containing the refresh token to revoke.</param>
+        /// <returns>
+        /// Returns 200 OK if the token was successfully revoked;  
+        /// Returns 404 Not Found if the token does not exist or is already revoked.
+        /// </returns>
+        [HttpPost("revoke")]
+        public async Task<IActionResult> Revoke([FromBody] RefreshTokenRequestDto dto)
+        {
+            var result = await _authService.RevokeAsync(dto.RefreshToken);
+            if (!result)
+                return NotFound("Token not found or already revoked");
+
+            return Ok("Refresh token successfully revoked");
         }
     }
 }

@@ -14,6 +14,12 @@ namespace ASPWebAPI.DAL.Repositories
             _db = db;
         }
 
+        public async Task<bool> ExistsAsync(int id)
+        {
+            var sql = "SELECT COUNT(1) FROM roles.Adopter WHERE Id = @Id";
+            return await _db.ExecuteScalarAsync<bool>(sql, new { Id = id });
+        }
+
         public async Task<IEnumerable<Adopter>> GetAllAsync()
         {
             var sql = "SELECT * FROM roles.Adopter";

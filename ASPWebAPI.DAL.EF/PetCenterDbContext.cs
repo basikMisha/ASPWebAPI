@@ -25,6 +25,8 @@ public partial class PetCenterDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Adopter>(entity =>
@@ -136,6 +138,30 @@ public partial class PetCenterDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .IsRequired();
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("RefreshToken", "auth");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Token)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .IsRequired();
+
+            entity.Property(e => e.Expires)
+                .HasColumnType("datetime");
+
+            entity.Property(e => e.IsRevoked)
+                .IsRequired();
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_RefreshToken_User");
         });
 
         OnModelCreatingPartial(modelBuilder);

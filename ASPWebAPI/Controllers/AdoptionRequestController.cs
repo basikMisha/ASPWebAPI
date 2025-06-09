@@ -56,10 +56,16 @@ namespace ASPWebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<AdoptionRequestDto>> Create([FromBody] CreateAdoptionRequestDto createDto)
         {
-            var adoptionRequest = _mapper.Map<AdoptionRequest>(createDto);
-            var created = await _adoptionRequestService.AddAsync(adoptionRequest);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id },
-                _mapper.Map<AdoptionRequestDto>(created));
+            try
+            {
+                var adoptionRequest = _mapper.Map<AdoptionRequest>(createDto);
+                var created = await _adoptionRequestService.AddAsync(adoptionRequest);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, _mapper.Map<AdoptionRequestDto>(created));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         /// <summary>
@@ -71,11 +77,18 @@ namespace ASPWebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<AdoptionRequestDto>> Update(int id, [FromBody] UpdateAdoptionRequestDto updateDto)
         {
-            var adoptionRequest = _mapper.Map<AdoptionRequest>(updateDto);
-            var updated = await _adoptionRequestService.UpdateAsync(id, adoptionRequest);
-            return updated is not null
-                ? Ok(_mapper.Map<AdoptionRequestDto>(updated))
-                : NotFound();
+            try
+            {
+                var adoptionRequest = _mapper.Map<AdoptionRequest>(updateDto);
+                var updated = await _adoptionRequestService.UpdateAsync(id, adoptionRequest);
+                return updated is not null
+                    ? Ok(_mapper.Map<AdoptionRequestDto>(updated))
+                    : NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         /// <summary>

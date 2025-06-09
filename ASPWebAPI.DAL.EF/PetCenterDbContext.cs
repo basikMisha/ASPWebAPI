@@ -23,6 +23,10 @@ public partial class PetCenterDbContext : DbContext
 
     public virtual DbSet<Volunteer> Volunteers { get; set; }
 
+    public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Adopter>(entity =>
@@ -113,6 +117,51 @@ public partial class PetCenterDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.StartDate).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("User", "auth");
+
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .IsRequired();
+
+            entity.Property(e => e.PasswordHash)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .IsRequired();
+
+            entity.Property(e => e.Role)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("RefreshToken", "auth");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Token)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .IsRequired();
+
+            entity.Property(e => e.Expires)
+                .HasColumnType("datetime");
+
+            entity.Property(e => e.IsRevoked)
+                .IsRequired();
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_RefreshToken_User");
         });
 
         OnModelCreatingPartial(modelBuilder);

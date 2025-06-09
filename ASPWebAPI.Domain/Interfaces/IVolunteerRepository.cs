@@ -2,5 +2,8 @@
 
 namespace ASPWebAPI.Domain.Interfaces
 {
-    public interface IVolunteerRepository : IRepository<Volunteer> {}
+    public interface IVolunteerRepository : IRepository<Volunteer>
+    {
+        Task<bool> ExistsAsync(int id);
+    }
 }

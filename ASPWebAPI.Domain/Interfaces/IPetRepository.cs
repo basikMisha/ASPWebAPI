@@ -2,5 +2,8 @@
 
 namespace ASPWebAPI.Domain.Interfaces
 {
-    public interface IPetRepository : IRepository<Pet> {}
+    public interface IPetRepository : IRepository<Pet> 
+    {
+        Task<bool> ExistsAsync(int id);
+    }
 }

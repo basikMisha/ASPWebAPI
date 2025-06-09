@@ -56,10 +56,17 @@ namespace ASPWebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<PetDto>> Create([FromBody] CreatePetDto createDto)
         {
-            var pet = _mapper.Map<Pet>(createDto);
-            var created = await _petService.AddAsync(pet);
-            return CreatedAtAction(nameof(GetById), new {id = created.Id},
-                _mapper.Map<PetDto>(created));
+            try
+            {
+                var pet = _mapper.Map<Pet>(createDto);
+                var created = await _petService.AddAsync(pet);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id },
+                    _mapper.Map<PetDto>(created));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         /// <summary>
@@ -71,11 +78,18 @@ namespace ASPWebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<PetDto>> Update(int id, [FromBody] UpdatePetDto updateDto)
         {
-            var pet = _mapper.Map<Pet>(updateDto);
-            var updated = await _petService.UpdateAsync(id, pet);
-            return updated is not null
-                ? Ok(_mapper.Map<PetDto>(updated))
-                : NotFound();
+            try
+            {
+                var pet = _mapper.Map<Pet>(updateDto);
+                var updated = await _petService.UpdateAsync(id, pet);
+                return updated is not null
+                    ? Ok(_mapper.Map<PetDto>(updated))
+                    : NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         /// <summary>

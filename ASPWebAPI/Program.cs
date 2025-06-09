@@ -100,6 +100,13 @@ builder.Services.AddSingleton(jwtSettings);
 
 var app = builder.Build();
 
+//Seed Admin
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await ASPWebAPI.Api.Infrastructure.DatabaseSeeder.SeedAdminUserAsync(services);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

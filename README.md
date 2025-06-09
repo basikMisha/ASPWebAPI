@@ -42,7 +42,7 @@ JWT Authentication
 git clone https://github.com/your-username/ASPWebAPI.git
 cd ASPWebAPI
 ```
-2. Create the Database
+### 2. Create the Database
 Run the SQL script to set up the initial database schema:
 
 Open SQL Server Management Studio (or any SQL tool)
@@ -55,7 +55,7 @@ Create the database PETCENTER
 Create schemas: roles, auth, adoption
 
 Create all necessary tables and indexes
-3. Configure JWT Authentication Key
+### 3. Configure JWT Authentication Key
 This project uses JWT for secure user authentication. You must configure a secret key using User Secrets:
 ```bash
 dotnet user-secrets init
@@ -65,7 +65,7 @@ Alternatively, in Visual Studio, right-click on the ASPWebAPI.Api project and se
 
 Note: The secret should be at least 64 characters long for HMACSHA512 security.
 
-4. Choose Data Access Strategy
+### 4. Choose Data Access Strategy
 You can switch between Dapper and EF Core by modifying appsettings.json:
 ```bash
 "UseEfDal": true
@@ -73,7 +73,7 @@ You can switch between Dapper and EF Core by modifying appsettings.json:
 true → Use Entity Framework Core (default option)
 
 false → Use Dapper
-5. Run the Application
+### 5. Run the Application
 ```bash
 dotnet run --project ASPWebAPI.Api
 ```
@@ -81,7 +81,7 @@ Once running, navigate to:
 ```bash
 https://localhost:5001/swagger
 ```
-6. Default Admin Account
+### 6. Default Admin Account
 On first launch, the application seeds a default admin account if no admin exists.
 
 Email: admin@example.com

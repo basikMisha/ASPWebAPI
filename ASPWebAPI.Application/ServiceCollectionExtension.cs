@@ -31,7 +31,7 @@ namespace ASPWebAPI.BLL
             services.AddScoped<IAdoptionRequestService, AdoptionRequestService>();
 
             services.AddScoped<JwtService>();
-            services.AddScoped<AuthService>();
+            services.AddScoped<IAuthService, AuthService>();
         }
     }
 }

@@ -2,6 +2,7 @@
 using ASPWebAPI.BLL.Interfaces;
 using ASPWebAPI.DTOs.User;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -14,7 +15,9 @@ namespace ASPWebAPI.Tests.Controllers
         {
             // Arrange
             var mockAuthService = new Mock<IAuthService>();
-            var controller = new AuthController(mockAuthService.Object);
+            var mockLogger = new Mock<ILogger<AuthController>>();
+            var controller = new AuthController(mockAuthService.Object, mockLogger.Object);
+            
 
             var testEmail = "test@example.com";
             var testPassword = "password";
@@ -47,7 +50,8 @@ namespace ASPWebAPI.Tests.Controllers
         {
             // Arrange
             var mockAuthService = new Mock<IAuthService>();
-            var controller = new AuthController(mockAuthService.Object);
+            var mockLogger = new Mock<ILogger<AuthController>>();
+            var controller = new AuthController(mockAuthService.Object, mockLogger.Object);
 
             var dto = new UserLoginDto
             {

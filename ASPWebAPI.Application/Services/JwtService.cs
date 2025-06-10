@@ -6,15 +6,25 @@ using ASPWebAPI.BLL.Configuration;
 
 namespace ASPWebAPI.BLL.Services
 {
+    /// <summary>
+    /// Service responsible for generating JSON Web Tokens (JWT) for authenticated users.
+    /// </summary>
     public class JwtService
     {
         private readonly JwtSettings _jwtSettings;
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="JwtService"/> with the specified JWT settings.
+        /// </summary>
+        /// <param name="jwtSettings">JWT configuration settings.</param>
         public JwtService(JwtSettings jwtSettings)
         {
             _jwtSettings = jwtSettings;
         }
 
+        /// <summary>
+        /// Generates a JWT token string for a user identified by userId, email and role.
+        /// </summary>
         public string GenerateToken(int userId, string email, string role)
         {
             var claims = new[]
